@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Дашборд новостей</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 24px;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .top-nav {
+            margin-bottom: 20px;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .feed-column {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            min-height: 80vh;
+        }
+        .feed-title {
+            margin-top: 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            font-size: 1.15rem;
+        }
+        .news-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .news-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 12px;
+            background: #fafafa;
+        }
+        .mock-card {
+            background: #f0f7ff;
+            border-color: #b9dafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/">⬅ Вернуться к выбору лент</a>
+    </div>
+
+    <h1>Сводный мониторинг лент</h1>
+
+    <div class="dashboard-grid">
+        <div class="feed-column">
+            <h2 class="feed-title">Новости Mail.ru</h2>
+            <div id="feed-mail" class="news-container"></div>
+        </div>
+
+        <div class="feed-column">
+            <h2 class="feed-title">Новости Lenta.ru</h2>
+            <div id="feed-lenta" class="news-container"></div>
+        </div>
+
+        <div class="feed-column">
+            <h2 class="feed-title"> Live Demo </h2>
+            <div id="feed-mock" class="news-container"></div>
+        </div>
+    </div>
+
+    <script>
+        function subscribeFeed(topicUrl, elementId, isMock = false) {
+            const container = document.getElementById(elementId);
+            const eventSource = new EventSource("/events?topic=" + encodeURIComponent(topicUrl));
+
+            eventSource.onmessage = function(event) {
+                const card = document.createElement("div");
+                card.className = isMock ? "news-card mock-card" : "news-card";
+                card.innerHTML = event.data;
+                container.prepend(card);
+            };
+
+            eventSource.onerror = function(err) {
+                console.error("Ошибка SSE соединения для топика:", topicUrl, err);
+            };
+        }
+
+        // Подключение трех независимых потоков
+        subscribeFeed("https://news.mail.ru/rss/90/", "feed-mail");
+        subscribeFeed("https://lenta.ru/rss", "feed-lenta");
+        subscribeFeed("mock", "feed-mock", true);
+    </script>
+</body>
+</html>

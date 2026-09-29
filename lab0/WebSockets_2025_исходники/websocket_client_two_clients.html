@@ -1,0 +1,57 @@
+<html>
+<head>
+<title>Летучка</title>
+<link rel="stylesheet" href="style.css" type="text/css"/>
+<meta charset="utf8">
+<script>
+
+let socket = new WebSocket("ws://151.248.113.144:8000");
+let socket2 = new WebSocket("ws://151.248.113.144:8001");
+
+socket.onopen = function(e) {
+  socket.send("Тестовая строка в сторону сервера! Прием!");
+};
+
+socket2.onopen = function(e2) {
+  socket2.send("Тестовая строка в сторону сервера N2! Прием!");
+};
+
+socket.onmessage = function(event) {
+  document.getElementById("id").innerHTML = event.data; 
+};
+
+socket2.onmessage = function(event2) {
+  document.getElementById("id2").innerHTML = event2.data; 
+};
+
+
+socket.onclose = function(event) {
+  if (event.wasClean) {
+    alert(`[close] Соединение закрыто чисто, код=${event.code} причина=${event.reason}`);
+  } else {
+    alert('[close] Соединение прервано');
+  }
+};
+
+socket2.onclose = function(event2) {
+  if (event2.wasClean) {
+    alert(`[close] Соединение закрыто чисто, код=${event2.code} причина=${event2.reason}`);
+  } else {
+    alert('[close] Соединение прервано');
+  }
+};
+
+socket.onerror = function(error) {
+  alert(`[error] ${error.message}`);
+};
+
+socket2.onerror = function(error2) {
+  alert(`[error2] ${error2.message}`);
+};
+</script>
+</head>
+<body>
+<div id="id">data from WS on 8000</div></br>
+<div id="id2">data from WS on 8001</div>
+</body>
+</html>

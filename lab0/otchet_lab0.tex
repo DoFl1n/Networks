@@ -1,0 +1,189 @@
+\documentclass[12pt]{report}
+
+
+% --- Шрифты и локализация (XeLaTeX) ---
+\usepackage{fontspec}
+\usepackage[russian]{babel}
+
+\setmainfont{Liberation Serif}
+\setsansfont{Liberation Sans}
+\setmonofont{Liberation Mono}
+
+% --- Математические пакеты (загружаем до tcolorbox) ---
+\usepackage{amsmath,amssymb,amsfonts}
+
+% --- Настройка полей страницы ---
+\usepackage{geometry}
+\geometry{
+    a4paper,
+    top=25mm,
+    bottom=25mm,
+    left=30mm,
+    right=20mm,
+    headheight=25pt,   % Устраняет предупреждение fancyhdr
+    footskip=10mm
+}
+
+% --- Цвета и заголовки ---
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+\definecolor{mainblue}{RGB}{26, 82, 118}   
+\definecolor{accentblue}{RGB}{41, 128, 185} 
+\definecolor{graybg}{RGB}{245, 247, 250}   
+
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{mainblue}}
+  {\filleft\normalfont\LARGE\sffamily\color{accentblue}\chaptertitlename\ \thechapter}
+  {20pt}
+  {\filleft\Huge}
+  [\vspace{1ex}\titlerule]
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{mainblue}\sffamily}
+  {\thesection}{1em}{}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{accentblue}\sffamily}
+  {\thesubsection}{1em}{}
+
+% --- Блоки tcolorbox ---
+\usepackage{tcolorbox}
+\tcbuselibrary{theorems}
+
+% Блок для важных заметок
+\newtcolorbox{note}[1][Важное примечание]{
+    colback=graybg,
+    colframe=accentblue,
+    fonttitle=\bfseries\sffamily,
+    coltitle=white,
+    title=#1,
+    arc=4mm,
+    boxrule=0.5mm,
+    before skip=10pt,
+    after skip=10pt
+}
+
+% Блок для определений
+\newtcolorbox{definition}[1][Определение]{
+    boxrule=0pt,
+    leftrule=3mm,
+    rightrule=0pt,
+    toprule=0pt,
+    bottomrule=0pt,
+    colframe=mainblue,
+    colback=graybg,
+    fonttitle=\bfseries\sffamily\color{mainblue},
+    title=#1,
+    attach title to upper,
+    after title={\par\smallskip},
+    arc=0mm,
+    before skip=10pt,
+    after skip=10pt
+}
+
+% Блок для теорем
+\newtcbtheorem[number within=chapter]{theorem}{Теорема}{
+    boxrule=0pt,
+    leftrule=3mm,
+    rightrule=0pt,
+    toprule=0pt,
+    bottomrule=0pt,
+    colframe=accentblue,
+    colback=graybg,
+    fonttitle=\bfseries\sffamily\color{mainblue},
+    coltitle=mainblue,
+    attach title to upper,
+    after title={\par\smallskip},
+    arc=0mm,
+    before skip=12pt,
+    after skip=12pt
+}{th}
+
+% --- Межстрочный интервал и абзацы ---
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{1.25cm}
+\setlength{\parskip}{4pt}
+
+% --- Списки ---
+\usepackage{enumitem}
+\setlist[itemize]{label=\color{accentblue}$\bullet$, topsep=4pt, itemsep=2pt}
+\setlist[enumerate]{label=\color{mainblue}\arabic*., topsep=4pt, itemsep=2pt}
+
+% --- Колонтитулы ---
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\color{gray}\leftmark}
+\fancyfoot[C]{\small\sffamily\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{accentblue}\leaders\hrule height \headrulewidth\hfill}}
+
+% --- Графика и гиперссылки ---
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{bookmark} % Ускоряет генерацию outline и убирает rerunfilecheck warnings
+\hypersetup{
+    colorlinks=true,
+    linkcolor=mainblue,
+    filecolor=magenta,      
+    urlcolor=accentblue,
+    pdftitle={Учебное пособие},
+    pdfencoding=auto
+}
+
+% --- Метаданные ---
+\author{Д. М. Востриков}
+\title{Формальная верификация в математике}
+\date{\the\year}
+
+% =======================================================
+\begin{document}
+\maketitle
+\tableofcontents
+
+\newpage
+
+\chapter{Глава 1}
+\section{Лекция 1. Бестиповое \texorpdfstring{$\lambda$}{λ}-исчисление}
+
+\begin{definition}
+Бестиповое $\lambda$-исчисление --- это формальная система для изучения функций и вычислений.
+\end{definition}
+
+Пусть $x \in \mathbb{R}$:
+\begin{itemize}
+    \item $\sin{1}$ --- действительное число;
+    \item $\sin{x}$ --- также действительное число.
+\end{itemize}
+
+Форма записи $(\lambda x.(\sin{x}+\cos{x}))(\pi)$: взяли функцию и применили её к числу (аппликация) $\sin{\pi} + \cos{\pi}$.
+
+Фиксируем множество:
+\begin{itemize}
+    \item $Var = \{x, y, z, \dots\}$
+    \item $\Lambda$ --- множество $\lambda$-термов
+    \item $Var \subset \Lambda$
+    \item $M, N \in \Lambda \implies (M \, N \in \Lambda)$
+    \item $x \in Var, \; M \in \Lambda \implies (\lambda x. M) \in \Lambda$
+\end{itemize}
+
+Соглашения: 
+\[ x \, y \, z := (xy)z \]
+\[ \lambda x. \lambda y. M = \lambda xy. M \]
+
+\begin{theorem}{Теорема Черча — Россера}{cr1}
+$\exists K$ такое, что если $N$ и $L$ $\beta$-эквивалентны $K$, то $N$ и $L$ также являются $\beta$-редукциями $M$.
+\end{theorem}
+
+\begin{theorem}{Теорема Черча — Россера (следствие)}{cr2}
+Если у терма $M$ существует нормальная форма $N$, то к ней всегда можно прийти, используя нормальную стратегию редукции.
+\end{theorem}
+
+\[ True := \lambda x y. x \]
+\[ False := \lambda x y. y \]
+\[ And := (\lambda x y. x y)\, False \]
+\[ Not := \lambda x. x \, False \, True \]
+
+\end{document}

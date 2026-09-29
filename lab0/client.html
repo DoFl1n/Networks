@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Летучка</title>
+  <meta charset="utf-8">
+  <script>
+    let socket = new WebSocket("ws://127.0.0.1:8008");
+
+    socket.onopen = function(e) {
+      appendLog("Соединение открыто");
+    };
+
+    socket.onmessage = function(event) {
+      appendLog("Сервер: " + event.data);
+    };
+
+    socket.onclose = function(event) {
+      appendLog("Соединение закрыто");
+    };
+
+    function sendMessage() {
+      const input = document.getElementById("msgInput");
+      if (input.value && socket.readyState === WebSocket.OPEN) {
+        socket.send(input.value);
+        appendLog("Вы: " + input.value);
+        input.value = "";
+      }
+    }
+
+    function appendLog(text) {
+      const log = document.getElementById("log");
+      log.innerHTML += `<div>${text}</div>`;
+    }
+  </script>
+</head>
+<body>
+  <div id="log" style="margin-bottom: 10px; font-family: monospace;"></div>
+  
+  <input type="text" id="msgInput" placeholder="Введите сообщение...">
+  <button onclick="sendMessage()">Отправить</button>
+</body>
+</html>

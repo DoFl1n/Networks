@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Лента новостей</title>
+</head>
+<body>
+    <p><a href="/">⬅ Вернуться к выбору лент</a></p>
+    <h1 id="feed-title">Новости ленты</h1>
+    <div id="news"></div>
+
+    <script>
+        // Извлекаем топик из URL
+        const params = new URLSearchParams(window.location.search);
+        const topic = params.get("topic");
+
+        // Отображаем название темы на странице
+        if (topic) {
+            document.getElementById("feed-title").textContent = "Лента: " + topic;
+
+            // Открываем SSE-соединение
+            const eventSource = new EventSource("/events?topic=" + encodeURIComponent(topic));
+
+            // Обрабатываем приходящие сообщения
+            eventSource.onmessage = function(event) {
+                const container = document.getElementById("news");
+                const item = document.createElement("div");
+                item.innerHTML = event.data;
+                // Добавляем свежую новость в самое начало
+                container.prepend(item);
+            };
+
+            // Логируем возможные ошибки соединения
+            eventSource.onerror = function(err) {
+                console.error("Ошибка SSE соединения:", err);
+            };
+        } else {
+            document.getElementById("feed-title").textContent = "Тема не указана!";
+        }
+    </script>
+</body>
+</html>

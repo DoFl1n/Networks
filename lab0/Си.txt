@@ -1,0 +1,114 @@
+1. 
+git clone https://github.com/Theldus/wsServer
+cd wsServer/
+make
+sudo make install
+
+поставит сюда:
+install -d /usr/local/lib64
+install -m 644 libws.a /usr/local/lib64
+install -d /usr/local/include/wsserver
+install -m 644 include/*.h /usr/local/include/wsserver
+install -d /usr/local/man/man3
+install -m 0644 doc/man/man3/*.3 /usr/local/man/man3/
+
+
+2. 
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ws.h>
+
+// Вызывается при открытии нового соединения
+void onopen(ws_cli_conn_t client) {
+    char *cli = ws_getaddress(client);
+    printf("Подключился клиент: %s\n", cli);
+    free(cli);
+    
+    // Отправить приветствие
+    ws_sendframe_txt(client, "hello world", false);
+}
+
+// Вызывается при закрытии соединения
+void onclose(ws_cli_conn_t client) {
+    char *cli = ws_getaddress(client);
+    printf("Клиент отключился: %s\n", cli);
+    free(cli);
+}
+
+// Вызывается при получении сообщения
+void onmessage(ws_cli_conn_t client, const unsigned char *msg, uint64_t size, int type) {
+    printf("Получено сообщение: %s (размер: %llu)\n", msg, size);
+    // Эхо-ответ
+    ws_sendframe_txt(client, (const char*)msg, false);
+}
+
+int main() {
+    struct ws_events evs;
+    evs.onopen = &onopen;
+    evs.onmessage = &onmessage;
+    evs.onclose = &onclose;
+
+    // Жестко задаем IP-адрес
+    struct ws_server server = {
+        .host = "192.168.1.100",
+        .port = 8080,
+        .events = &evs
+    };
+
+    ws_socket(&server);
+    
+    return 0;
+}
+
+3.
+gcc server.c -lws -o server
+./server
+
+
+
+4.
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <ws.h>
+
+// Вызывается при открытии нового соединения
+void onopen(ws_cli_conn_t client) {
+    char *cli = ws_getaddress(client);
+    printf("Подключился клиент: %s\n", cli);
+    free(cli);
+    
+    // Отправить приветствие (только 2 аргумента!)
+    ws_sendframe_txt(client, "hello world");
+}
+
+// Вызывается при закрытии соединения
+void onclose(ws_cli_conn_t client) {
+    char *cli = ws_getaddress(client);
+    printf("Клиент отключился: %s\n", cli);
+    free(cli);
+}
+
+// Вызывается при получении сообщения
+void onmessage(ws_cli_conn_t client, const unsigned char *msg, uint64_t size, int type) {
+    printf("Получено сообщение: %s (размер: %llu)\n", msg, size);
+    // Эхо-ответ (только 2 аргумента!)
+    ws_sendframe_txt(client, (const char*)msg);
+}
+
+int main() {
+    // Жестко задаем IP-адрес
+    struct ws_server server = {
+        .host = "192.168.1.100",  // или "0.0.0.0" для всех интерфейсов
+        .port = 8080,
+        .onopen = &onopen,
+        .onmessage = &onmessage,
+        .onclose = &onclose
+    };
+
+    // Запуск сервера
+    ws_socket(&server);
+    
+    return 0;
+}

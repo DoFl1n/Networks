@@ -1,0 +1,47 @@
+\documentclass[10pt]{article}
+\usepackage[usenames]{color} %pour la couleur
+\usepackage{amssymb} %maths
+\usepackage{amsmath} %maths
+\usepackage[utf8]{inputenc} %utile pour taper directement les caractères accentués
+\begin{document}
+\begin{align*}\begin{align*}<!DOCTYPE html>
+<html>
+<head>
+  <title>Летучка</title>
+  <link rel="stylesheet" href="style.css" type="text/css"/>
+  <meta charset="utf-8">
+  <script>
+    let socket = null;
+
+    function connect() {
+      socket = new WebSocket("ws://127.0.0.1:8008");
+
+      socket.onopen = function(e) {
+        socket.send("Тестовая строка в сторону сервера! Прием!");
+      };
+
+      socket.onmessage = function(event) {
+        const el = document.getElementById("id");
+        if (el) {
+          el.innerHTML = event.data;
+        }
+      };
+
+      socket.onclose = function(event) {
+        setTimeout(connect, 3000);
+      };
+
+      socket.onerror = function(error) {
+        console.error("WebSocket error:", error);
+      };
+    }
+
+    window.addEventListener("DOMContentLoaded", connect);
+  </script>
+</head>
+<body>
+  <div id="id">data</div>
+</body>
+</html>\end{align*}
+\end{align*}
+\end{document}
